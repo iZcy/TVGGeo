@@ -1,0 +1,28 @@
+# Window Vars
+root = None
+canvas = None
+frame = None
+
+# Set the window size (width x height)
+window_width = 600
+window_height = 600
+
+# Set the origin coordinates
+origin_x = window_width // 2
+origin_y = window_height // 2
+
+# Gap Config
+pixelgap = 30
+x_gap = 0
+y_gap = 0
+
+# Scale Config
+zoomX = 1
+zoomY = 1
+
+# Timer
+# time = 0.1
+
+#Object
+obj_shapes = []
+selected_object = None
