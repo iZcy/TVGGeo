@@ -1,20 +1,17 @@
 from globals import variables
 from visualizers.drawers import *
 from systems.events import *
-from systems.dash import *
-import tkinter as tk
 import numpy as np
 import math
 
-normalizor = 2*variables.pixelgap
-
 class Shapes:
-    def __init__(self, name, color="black", outline="black", coords=[[0,0]], cpos = [0,0]):
+    def __init__(self, name, color="black", outline="black", coords=[[0,0]], cpos = [0,0], launcher=None):
         self.name = name
         self.coords = coords
         self.cpos = cpos
         self.color = color
         self.outline = outline
+        self.launcher = launcher
         
     def onSelect(self, selected=False):
         if selected:
@@ -71,24 +68,20 @@ class Shapes:
         self.coords = newPos
         
         if not static:
-            self.cpos = (transformation(coords=[[var * normalizor for var in self.cpos]], trans=transMatrix))[0]
-            self.cpos = [var / normalizor for var in self.cpos]
+            self.cpos = (transformation(coords=[self.cpos], trans=transMatrix))[0]
         
         self.refresh()
-        
+    
     def refresh(self):
-        launch_dash(on_button_click)
-        draw_objects()
+        self.launcher()
         
     def destroy(self):
         variables.obj_shapes = [obj for obj in variables.obj_shapes if obj.name != self.name]
-        print(variables.obj_shapes)
-        
         variables.selected_object = None
         self.refresh()
         del self
 
-def create_rect(width, height, name, color, outline):
+def create_rect(width, height, name, color, outline, launcher):
     # Calculate the coordinates of the square
     x1 = variables.origin_x - width * variables.pixelgap
     y1 = variables.origin_y - height * variables.pixelgap
@@ -96,7 +89,7 @@ def create_rect(width, height, name, color, outline):
     y2 = variables.origin_y + height * variables.pixelgap
     
     # Draw the square and add it to the obj_shapes list
-    newRect = Shapes(name=name, color=color, outline=outline, coords=[[x1, y1], [x1, y2], [x2, y2], [x2, y1]])
+    newRect = Shapes(name=name, color=color, outline=outline, coords=[[x1, y1], [x1, y2], [x2, y2], [x2, y1]], launcher=launcher)
     
     variables.obj_shapes.append(newRect)
 

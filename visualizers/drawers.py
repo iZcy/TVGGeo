@@ -29,6 +29,9 @@ def draw_cartesian(color):
 def draw_shapes():
     if len(variables.obj_shapes) != 0:
         for obj in variables.obj_shapes:
+            if len(obj.coords) == 0:
+                break
+            
             vert_list = sum(obj.coords, [])
             polygon = variables.canvas.create_polygon(vert_list, fill=obj.color, outline=obj.outline, width=3)
             variables.canvas.tag_bind(polygon, "<Motion>", enter_cursor)

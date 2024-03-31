@@ -27,10 +27,15 @@ zoomY = 1
 obj_shapes = []
 selected_object = None
 
-# Cache
+# Transformation Cache
 trans_x = 0.0
 trans_y = 0.0
 scale_x = 1.0
 scale_y = 1.0
 rot = 0.0
 insertingMatrix = False
+
+# Add Object
+creatingObject = False
+editingObject = None
+numObj = 0

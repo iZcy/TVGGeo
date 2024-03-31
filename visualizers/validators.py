@@ -23,6 +23,12 @@ def check_points(event):
         cond = point_inside_polygon(event.x, event.y, obj.coords)
         obj.onSelect(selected=False)
         variables.insertingMatrix = False
+        if variables.selected_object != None:
+            variables.selected_object.onSelect(selected=False)
+        
+        if variables.creatingObject == False:
+            variables.pickedVertex = []
+        
         if (cond):
             obj.onSelect(selected=True)
             return obj
