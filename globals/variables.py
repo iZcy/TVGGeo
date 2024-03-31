@@ -26,3 +26,10 @@ zoomY = 1
 #Object
 obj_shapes = []
 selected_object = None
+
+# Cache
+trans_x = 0.0
+trans_y = 0.0
+scale_x = 1.0
+scale_y = 1.0
+rot = 0.0

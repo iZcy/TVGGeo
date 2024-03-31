@@ -1,3 +1,5 @@
+from globals import variables
+
 def point_inside_polygon(x, y, poly):
     n = len(poly)
     inside = False
@@ -16,9 +18,8 @@ def point_inside_polygon(x, y, poly):
 
     return inside
 
-def check_points(event, obj_shapes):
-    
-    for obj in obj_shapes:
+def check_points(event):
+    for obj in variables.obj_shapes:
         cond = point_inside_polygon(event.x, event.y, obj.coords)
         if (cond):
             return obj

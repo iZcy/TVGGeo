@@ -1,26 +1,52 @@
-from globals.variables import *
+from globals import variables
 from visualizers.drawers import *
+from systems.events import *
+from systems.dash import *
 
 class Shapes:
-    def __init__(self, name, canvas, color="black", outline="black", coords=[[0,0]], dpos = [0,0]):
+    def __init__(self, name, color="black", outline="black", coords=[[0,0]], dpos = [0,0]):
         self.name = name
         self.coords = coords
         self.dpos = dpos
         self.color = color
         self.outline = outline
-        self.canvas = canvas
         
-    def move(self, posX=0, posY=0):
-        self.dpos = (self.dpos[0] + posX*pixelgap, self.dpos[1] - posY*pixelgap)
-        draw_objects(self.canvas, window_width, window_height, origin_x, origin_y, x_gap, y_gap, zoomX, zoomY, obj_shapes)
+    def move(self, posX=None, posY=None):
+        dPosX, dPosY = 0, 0
+        if posX != None:
+            dPosX = posX
+            variables.trans_x=posX
+        if posY != None:
+            dPosY = posY
+            variables.trans_y=posY
         
-def create_rect(canvas, color, outline, width, height, origin_x, origin_y, obj_shapes):
+        self.dpos = [self.dpos[0] + dPosX, self.dpos[1] + dPosY]
+        self.updatePos(posX=dPosX, posY=dPosY)
+    
+    def scale(self, scaleX=1, scaleY=1):
+        variables.scale_x=scaleX
+        variables.scale_y=scaleY
+        
+        self.dscale = [self.dscale[0] * scaleX, self.dscale[1] * scaleY]
+        self.updatePos(self, scaleX=scaleX, scaleY=scaleY)
+        
+    def updatePos(self, posX=0, posY=0, scaleX=1, scaleY=1, rot=0):
+        for coord in self.coords:
+            coord[0] += posX * variables.pixelgap
+            coord[0] *= scaleX
+            coord[1] -= posY * variables.pixelgap
+            coord[1] *= scaleY
+            
+        launch_dash(on_button_click)
+        draw_objects()
+        
+def create_rect(width, height, name, color, outline):
     # Calculate the coordinates of the square
-    x1 = origin_x - width * pixelgap
-    y1 = origin_y - height * pixelgap
-    x2 = origin_x + width * pixelgap
-    y2 = origin_y + height * pixelgap
+    x1 = variables.origin_x - width * variables.pixelgap
+    y1 = variables.origin_y - height * variables.pixelgap
+    x2 = variables.origin_x + width * variables.pixelgap
+    y2 = variables.origin_y + height * variables.pixelgap
     
     # Draw the square and add it to the obj_shapes list
-    newRect = Shapes(canvas=canvas, name="RectA", color=color, outline=outline, coords=[[x1, y1], [x1, y2], [x2, y2], [x2, y1]])
-    obj_shapes.append(newRect)
+    newRect = Shapes(name=name, color=color, outline=outline, coords=[[x1, y1], [x1, y2], [x2, y2], [x2, y1]])
+    variables.obj_shapes.append(newRect)
