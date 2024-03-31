@@ -17,11 +17,11 @@ def launch_window():
     variables.root.iconbitmap("./globals/icons.ico")
     
     # Create a canvas
-    variables.canvas = tk.Canvas(variables.root, width=variables.window_width, height=variables.window_height-100)
+    variables.canvas = tk.Canvas(variables.root, width=variables.window_width, height=variables.window_height-120)
     variables.canvas.pack()
     
     # Create a frame
-    variables.frame = tk.Frame(variables.root)
+    variables.frame = tk.Frame(variables.root, width=variables.window_width, height=variables.window_height)
     variables.frame.pack(padx=10, pady=10)
     
     bindings()

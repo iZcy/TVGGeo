@@ -32,10 +32,10 @@ def on_button_click(entry, type):
     if (resp == 0):
         None
     elif (type == "x"):
-        variables.x_gap += resp
+        variables.x_gap += resp*variables.zoomX
         variables.trans_x = resp
     elif (type == "y"):
-        variables.y_gap += resp
+        variables.y_gap += resp*variables.zoomY
         variables.trans_y = resp
     elif (type == "sx"):
         variables.zoomX *= resp

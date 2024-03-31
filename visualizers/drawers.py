@@ -30,7 +30,9 @@ def draw_shapes():
     if len(variables.obj_shapes) != 0:
         for obj in variables.obj_shapes:
             vert_list = sum(obj.coords, [])
-            variables.canvas.create_polygon(vert_list, fill=obj.color, outline=obj.outline, width=3)
+            polygon = variables.canvas.create_polygon(vert_list, fill=obj.color, outline=obj.outline, width=3)
+            variables.canvas.tag_bind(polygon, "<Motion>", enter_cursor)
+            variables.canvas.tag_bind(polygon, "<Leave>", leave_cursor)
 
 def draw_objects():
     variables.canvas.delete("all")
@@ -40,3 +42,9 @@ def draw_objects():
     
     # Draw Cartesian coordinate system
     draw_cartesian(color="black")
+
+def enter_cursor(event):
+    variables.root.config(cursor="hand2")
+
+def leave_cursor(event):
+    variables.root.config(cursor="")

@@ -22,6 +22,7 @@ def check_points(event):
     for obj in variables.obj_shapes:
         cond = point_inside_polygon(event.x, event.y, obj.coords)
         obj.onSelect(selected=False)
+        variables.insertingMatrix = False
         if (cond):
             obj.onSelect(selected=True)
             return obj

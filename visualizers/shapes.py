@@ -28,10 +28,12 @@ class Shapes:
         dposX, dposY = 0, 0
         if posX != None:
             dposX = posX
-            variables.trans_x=posX
+            if not static:
+                variables.trans_x=posX
         if posY != None:
             dposY = posY
-            variables.trans_y=posY
+            if not static:
+                variables.trans_y=posY
         
         translateMtx = getTranslateMatrix(transX=dposX, transY=dposY)
         self.transform(transMatrix=translateMtx, static=static)
@@ -40,10 +42,12 @@ class Shapes:
         dScaleX, dScaleY = 1, 1
         if scaleX != None:
             dScaleX = scaleX
-            variables.scale_x=scaleX
+            if not static:
+                variables.scale_x=scaleX
         if scaleY != None:
             dScaleY = scaleY
-            variables.scale_y=scaleY
+            if not static:
+                variables.scale_y=scaleY
         
         scaleTransMtx = getScaleMatrix(scaleX=dScaleX, scaleY=dScaleY)
         self.transform(transMatrix=scaleTransMtx, static=static)
@@ -57,7 +61,8 @@ class Shapes:
         self.transform(transMatrix=refTransMtx, static=static)
     
     def rotate(self, deg=0, static=False):
-        variables.rot = deg
+        if not static:
+            variables.rot = deg
         rotDegMtx = getRotMatrix(deg)
         self.transform(transMatrix=rotDegMtx, static=static)
         
@@ -65,7 +70,7 @@ class Shapes:
         newPos = transformation(coords=self.coords, trans=transMatrix)
         self.coords = newPos
         
-        if (not static):
+        if not static:
             self.cpos = (transformation(coords=[[var * normalizor for var in self.cpos]], trans=transMatrix))[0]
             self.cpos = [var / normalizor for var in self.cpos]
         
@@ -74,6 +79,14 @@ class Shapes:
     def refresh(self):
         launch_dash(on_button_click)
         draw_objects()
+        
+    def destroy(self):
+        variables.obj_shapes = [obj for obj in variables.obj_shapes if obj.name != self.name]
+        print(variables.obj_shapes)
+        
+        variables.selected_object = None
+        self.refresh()
+        del self
 
 def create_rect(width, height, name, color, outline):
     # Calculate the coordinates of the square
@@ -140,5 +153,5 @@ def getScaleMatrix(scaleX=1, scaleY=1):
     return transMatrix
 
 def getTranslateMatrix(transX=0, transY=0):
-    transMatrix=[[1, 0, 0], [0, 1, 0], [transX, transY, 1]]
+    transMatrix=[[1, 0, 0], [0, 1, 0], [transX*variables.zoomX, transY*variables.zoomY, 1]]
     return transMatrix
