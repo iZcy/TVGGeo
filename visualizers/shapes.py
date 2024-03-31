@@ -2,36 +2,41 @@ from globals import variables
 from visualizers.drawers import *
 from systems.events import *
 from systems.dash import *
+import tkinter as tk
+import numpy as np
+import math
+
+normalizor = 2*variables.pixelgap
 
 class Shapes:
-    def __init__(self, name, color="black", outline="black", coords=[[0,0]], dpos = [0,0]):
+    def __init__(self, name, color="black", outline="black", coords=[[0,0]], cpos = [0,0]):
         self.name = name
         self.coords = coords
-        self.dpos = dpos
+        self.cpos = cpos
         self.color = color
         self.outline = outline
+        
+    def onSelect(self, selected=False):
+        if selected:
+            self.outline="black"
+        else:
+            self.outline=self.color
+        
+        self.refresh()
     
-    def getPos(self):
-        matrixCoor = []
-        for coor in self.coords:
-            xPos = (coor[0] - variables.window_width/2)/variables.pixelgap+variables.x_gap
-            yPos = -((coor[1] - variables.window_height/2)/variables.pixelgap+variables.y_gap)
-            matrixCoor.append([xPos, yPos])
-        return matrixCoor
-    
-    def move(self, posX=None, posY=None):
-        dPosX, dPosY = 0, 0
+    def move(self, posX=None, posY=None, static=False):
+        dposX, dposY = 0, 0
         if posX != None:
-            dPosX = posX
+            dposX = posX
             variables.trans_x=posX
         if posY != None:
-            dPosY = posY
+            dposY = posY
             variables.trans_y=posY
         
-        self.dpos = [self.dpos[0] + dPosX, self.dpos[1] + dPosY]
-        self.updatePos(posX=dPosX, posY=dPosY)
+        translateMtx = getTranslateMatrix(transX=dposX, transY=dposY)
+        self.transform(transMatrix=translateMtx, static=static)
     
-    def scale(self, scaleX=None, scaleY=None):
+    def scale(self, scaleX=None, scaleY=None, static=False):
         dScaleX, dScaleY = 1, 1
         if scaleX != None:
             dScaleX = scaleX
@@ -40,34 +45,36 @@ class Shapes:
             dScaleY = scaleY
             variables.scale_y=scaleY
         
-        self.updatePos(scaleX=dScaleX, scaleY=dScaleY)
+        scaleTransMtx = getScaleMatrix(scaleX=dScaleX, scaleY=dScaleY)
+        self.transform(transMatrix=scaleTransMtx, static=static)
         
-    def reflect(self, axis="x"):
+    def reflect(self, axis="x", static=False):
+        refTransMtx = []
         if axis == "x":
-            self.updatePos(scaleX=-1)
+            refTransMtx = getScaleMatrix(scaleX=-1)
         elif axis == "y":
-            self.updatePos(scaleY=-1)
+            refTransMtx = getScaleMatrix(scaleY=-1)
+        self.transform(transMatrix=refTransMtx, static=static)
+    
+    def rotate(self, deg=0, static=False):
+        variables.rot = deg
+        rotDegMtx = getRotMatrix(deg)
+        self.transform(transMatrix=rotDegMtx, static=static)
         
-    def updatePos(self, posX=0, posY=0, scaleX=1, scaleY=1, rot=0):
-        for coord in self.coords:
-            coord[0] += posX * variables.pixelgap * (variables.zoomX / abs(variables.zoomX))
-            coord[1] -= posY * variables.pixelgap * (variables.zoomY / abs(variables.zoomY))
-            
-            coord[0] += variables.x_gap*variables.pixelgap
-            coord[0] -= variables.window_width/2
-            coord[0] *= scaleX
-            coord[0] += variables.window_width/2
-            coord[0] -= variables.x_gap*variables.pixelgap
-            
-            coord[1] -= variables.y_gap*variables.pixelgap
-            coord[1] -= variables.window_height/2
-            coord[1] *= scaleY
-            coord[1] += variables.window_height/2
-            coord[1] += variables.y_gap*variables.pixelgap
-            
+    def transform(self, transMatrix, static=False):
+        newPos = transformation(coords=self.coords, trans=transMatrix)
+        self.coords = newPos
+        
+        if (not static):
+            self.cpos = (transformation(coords=[[var * normalizor for var in self.cpos]], trans=transMatrix))[0]
+            self.cpos = [var / normalizor for var in self.cpos]
+        
+        self.refresh()
+        
+    def refresh(self):
         launch_dash(on_button_click)
         draw_objects()
-        
+
 def create_rect(width, height, name, color, outline):
     # Calculate the coordinates of the square
     x1 = variables.origin_x - width * variables.pixelgap
@@ -77,4 +84,61 @@ def create_rect(width, height, name, color, outline):
     
     # Draw the square and add it to the obj_shapes list
     newRect = Shapes(name=name, color=color, outline=outline, coords=[[x1, y1], [x1, y2], [x2, y2], [x2, y1]])
+    
     variables.obj_shapes.append(newRect)
+
+def getNormPos(coords):
+    matrixCoor = []
+    for coor in coords:
+        xPos =   (coor[0] - variables.window_width/2)/variables.pixelgap+variables.x_gap
+        yPos = -((coor[1] - variables.window_height/2)/variables.pixelgap+variables.y_gap)
+        matrixCoor.append([xPos, yPos])
+    return matrixCoor
+
+def getBackPos(coords):
+    matrixPos = []
+    for coor in coords:
+        xPos =  (coor[0]-variables.x_gap)*variables.pixelgap + variables.window_height/2
+        yPos = ((-coor[1])-variables.y_gap)*variables.pixelgap + variables.window_height/2
+        matrixPos.append([xPos, yPos])
+    return matrixPos
+
+def transformation(coords, trans):
+    # Normalize Coordinate
+    normPos = getNormPos(coords=coords)
+    
+    # Expand to 3D
+    for norm in normPos:
+        norm.append(1)
+    # Change to Matrix
+    normMtx = np.array(normPos)
+    
+    # Get Transformation Matrix
+    matrixOrdTrans = trans
+    matrixTrans = np.array(matrixOrdTrans)
+    
+    # Execute Transformation
+    matrixRes = np.dot(normMtx, matrixTrans)
+    
+    # Back to Arrays
+    matrixBack = matrixRes.tolist()
+    
+    # Cut Last Row
+    matrixBack = [row[:-1] for row in matrixBack]
+    
+    # Convert to Ordinary Coordinate
+    matrixBack = getBackPos(matrixBack)
+    
+    return matrixBack
+
+def getRotMatrix(deg):
+    transMatrix=[[math.cos(math.radians(deg)),-math.sin(math.radians(deg)),0],[math.sin(math.radians(deg)),math.cos(math.radians(deg)),0],[0,0,1]]
+    return transMatrix
+
+def getScaleMatrix(scaleX=1, scaleY=1):
+    transMatrix=[[scaleX, 0, 0], [0, scaleY, 0], [0, 0, 1]]
+    return transMatrix
+
+def getTranslateMatrix(transX=0, transY=0):
+    transMatrix=[[1, 0, 0], [0, 1, 0], [transX, transY, 1]]
+    return transMatrix

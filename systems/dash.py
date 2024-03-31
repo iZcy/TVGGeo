@@ -12,12 +12,17 @@ def launch_dash(on_button_click, reset=False):
         variables.trans_y = 0
         variables.scale_x = 1
         variables.scale_y = 1
+        variables.rot = 0
     
+    for widget in variables.frame.winfo_children():
+        widget.destroy()
+            
     # Create a Text widget with state="disabled" to make it read-only
-    pos_string = f"({f"{variables.x_gap}, {variables.y_gap}" if not_selected else f"{variables.selected_object.dpos[0]}, {variables.selected_object.dpos[1]}"})"
+    pos_string = f"({f"{variables.x_gap}, {variables.y_gap}" if not_selected else f"{variables.selected_object.cpos[0]}, {variables.selected_object.cpos[1]}"})"
     
-    text_widget = tk.Label(variables.frame, text=f"Selecting : {"Default Display" if not_selected else variables.selected_object.name} {pos_string}", height=1)
-    text_widget.grid(row=0, column=0, columnspan=5)
+    text_widget = tk.Label(variables.frame, height=1)
+    text_widget.grid(row=0, column=0, columnspan=5 + (0 if not_selected else 1))
+    text_widget.config(text=f"Selecting : {("Default Display") if not_selected else (variables.selected_object.name)} {pos_string}")
     
     # Create a Translate X
     entryTX = tk.Entry(variables.frame, width=10)
@@ -58,3 +63,12 @@ def launch_dash(on_button_click, reset=False):
     # Create a Reflect Y
     buttonRy = tk.Button(variables.frame, text="Reflect Y", command=(lambda: on_button_click(entry=entryNull, type="ry")) if not_selected else (lambda: variables.selected_object.reflect(axis="y")))
     buttonRy.grid(row=2, column=4, padx=(0, 10))
+    
+    if not not_selected:
+        # Create a Rotation Matrix
+        entryRot = tk.Entry(variables.frame, width=10)
+        entryRot.grid(row=1, column=5, padx=5)
+        entryRot.insert(0, float(variables.rot))
+        
+        buttonRot = tk.Button(variables.frame, text="Rotate", command=(lambda: on_button_click(entry=entryRot, type="rt")) if not_selected else (lambda: variables.selected_object.rotate(deg=float(entryRot.get()))))
+        buttonRot.grid(row=2, column=5, padx=(0, 10))

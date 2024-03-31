@@ -21,6 +21,8 @@ def point_inside_polygon(x, y, poly):
 def check_points(event):
     for obj in variables.obj_shapes:
         cond = point_inside_polygon(event.x, event.y, obj.coords)
+        obj.onSelect(selected=False)
         if (cond):
+            obj.onSelect(selected=True)
             return obj
     return None

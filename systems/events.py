@@ -4,9 +4,7 @@ from globals import variables
 from systems.dash import launch_dash
 
 def on_screen_click(event):
-    # Destroy or remove all widgets contained within the frame
-    for widget in variables.frame.winfo_children():
-        widget.destroy()
+    # print(event.x, event.y)
     
     prevName = None
     if variables.selected_object != None:
@@ -48,27 +46,20 @@ def on_button_click(entry, type):
         
     # Move the objects relative to the plane
     for obj in variables.obj_shapes:
-        posX=0
-        posY=0
-        scaleX=1
-        scaleY=1
-        rot=0
-        
         if (resp == 0):
             break
         elif (type == "x"):
-            posX = -resp
+            obj.move(posX=-resp, static=True)
         elif (type == "y"):
-            posY = -resp
+            obj.move(posY=-resp, static=True)
         elif (type == "sx"):
-            scaleX = resp
+            obj.scale(scaleX=resp, static=True)
         elif (type == "sy"):
-            scaleY = resp
+            obj.scale(scaleY=resp, static=True)
         elif (type == "rx"):
-            scaleX = -1
+            obj.reflect(axis="x", static=False)
         elif (type == "ry"):
-            scaleY = -1
-        obj.updatePos(posX, posY, scaleX, scaleY, rot)
+            obj.reflect(axis="y", static=False)
     
     draw_objects()
     launch_dash(on_button_click)

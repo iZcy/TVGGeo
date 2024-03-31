@@ -30,7 +30,7 @@ def draw_shapes():
     if len(variables.obj_shapes) != 0:
         for obj in variables.obj_shapes:
             vert_list = sum(obj.coords, [])
-            variables.canvas.create_polygon(vert_list, fill=obj.color, outline=obj.outline, width=2)
+            variables.canvas.create_polygon(vert_list, fill=obj.color, outline=obj.outline, width=3)
 
 def draw_objects():
     variables.canvas.delete("all")
