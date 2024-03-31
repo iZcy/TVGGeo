@@ -42,10 +42,16 @@ class Shapes:
         
         self.updatePos(scaleX=dScaleX, scaleY=dScaleY)
         
+    def reflect(self, axis="x"):
+        if axis == "x":
+            self.updatePos(scaleX=-1)
+        elif axis == "y":
+            self.updatePos(scaleY=-1)
+        
     def updatePos(self, posX=0, posY=0, scaleX=1, scaleY=1, rot=0):
         for coord in self.coords:
-            coord[0] += posX * variables.pixelgap
-            coord[1] -= posY * variables.pixelgap
+            coord[0] += posX * variables.pixelgap * (variables.zoomX / abs(variables.zoomX))
+            coord[1] -= posY * variables.pixelgap * (variables.zoomY / abs(variables.zoomY))
             
             coord[0] += variables.x_gap*variables.pixelgap
             coord[0] -= variables.window_width/2

@@ -26,6 +26,11 @@ def on_button_click(entry, type):
     resp = float(text)
 
     # Move the plane
+    if (type == "rx"):
+        variables.zoomX *= -1
+    elif (type == "ry"):
+        variables.zoomY *= -1
+    
     if (resp == 0):
         None
     elif (type == "x"):
@@ -43,25 +48,27 @@ def on_button_click(entry, type):
         
     # Move the objects relative to the plane
     for obj in variables.obj_shapes:
-        for axis in obj.coords:
-            if (resp == 0):
-                break
-            elif (type == "x"):
-                axis[0] -= variables.pixelgap*resp*variables.zoomX
-            elif (type == "y"):
-                axis[1] += variables.pixelgap*resp*variables.zoomY
-            elif (type == "sx"):
-                axis[0] += variables.x_gap*variables.pixelgap
-                axis[0] -= variables.window_width/2
-                axis[0] *= resp
-                axis[0] += variables.window_width/2
-                axis[0] -= variables.x_gap*variables.pixelgap
-            elif (type == "sy"):
-                axis[1] -= variables.y_gap*variables.pixelgap
-                axis[1] -= variables.window_height/2
-                axis[1] *= resp
-                axis[1] += variables.window_height/2
-                axis[1] += variables.y_gap*variables.pixelgap
+        posX=0
+        posY=0
+        scaleX=1
+        scaleY=1
+        rot=0
+        
+        if (resp == 0):
+            break
+        elif (type == "x"):
+            posX = -resp
+        elif (type == "y"):
+            posY = -resp
+        elif (type == "sx"):
+            scaleX = resp
+        elif (type == "sy"):
+            scaleY = resp
+        elif (type == "rx"):
+            scaleX = -1
+        elif (type == "ry"):
+            scaleY = -1
+        obj.updatePos(posX, posY, scaleX, scaleY, rot)
     
     draw_objects()
     launch_dash(on_button_click)
