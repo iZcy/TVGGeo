@@ -1,8 +1,8 @@
 from globals import variables
 
 def draw_cartesian(color):
-    origin_x = (variables.origin_x - variables.x_gap*variables.pixelgap)*variables.zoomX
-    origin_y = (variables.origin_y + variables.y_gap*variables.pixelgap)*variables.zoomY
+    origin_x = (variables.origin_x - variables.x_gap*variables.pixelgap)
+    origin_y = (variables.origin_y + variables.y_gap*variables.pixelgap)
 
     zoomX=variables.zoomX
     zoomY=variables.zoomY

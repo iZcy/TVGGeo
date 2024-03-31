@@ -10,7 +10,15 @@ class Shapes:
         self.dpos = dpos
         self.color = color
         self.outline = outline
-        
+    
+    def getPos(self):
+        matrixCoor = []
+        for coor in self.coords:
+            xPos = (coor[0] - variables.window_width/2)/variables.pixelgap+variables.x_gap
+            yPos = -((coor[1] - variables.window_height/2)/variables.pixelgap+variables.y_gap)
+            matrixCoor.append([xPos, yPos])
+        return matrixCoor
+    
     def move(self, posX=None, posY=None):
         dPosX, dPosY = 0, 0
         if posX != None:
@@ -23,19 +31,33 @@ class Shapes:
         self.dpos = [self.dpos[0] + dPosX, self.dpos[1] + dPosY]
         self.updatePos(posX=dPosX, posY=dPosY)
     
-    def scale(self, scaleX=1, scaleY=1):
-        variables.scale_x=scaleX
-        variables.scale_y=scaleY
+    def scale(self, scaleX=None, scaleY=None):
+        dScaleX, dScaleY = 1, 1
+        if scaleX != None:
+            dScaleX = scaleX
+            variables.scale_x=scaleX
+        if scaleY != None:
+            dScaleY = scaleY
+            variables.scale_y=scaleY
         
-        self.dscale = [self.dscale[0] * scaleX, self.dscale[1] * scaleY]
-        self.updatePos(self, scaleX=scaleX, scaleY=scaleY)
+        self.updatePos(scaleX=dScaleX, scaleY=dScaleY)
         
     def updatePos(self, posX=0, posY=0, scaleX=1, scaleY=1, rot=0):
         for coord in self.coords:
             coord[0] += posX * variables.pixelgap
-            coord[0] *= scaleX
             coord[1] -= posY * variables.pixelgap
+            
+            coord[0] += variables.x_gap*variables.pixelgap
+            coord[0] -= variables.window_width/2
+            coord[0] *= scaleX
+            coord[0] += variables.window_width/2
+            coord[0] -= variables.x_gap*variables.pixelgap
+            
+            coord[1] -= variables.y_gap*variables.pixelgap
+            coord[1] -= variables.window_height/2
             coord[1] *= scaleY
+            coord[1] += variables.window_height/2
+            coord[1] += variables.y_gap*variables.pixelgap
             
         launch_dash(on_button_click)
         draw_objects()

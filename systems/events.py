@@ -51,9 +51,17 @@ def on_button_click(entry, type):
             elif (type == "y"):
                 axis[1] += variables.pixelgap*resp*variables.zoomY
             elif (type == "sx"):
+                axis[0] += variables.x_gap*variables.pixelgap
+                axis[0] -= variables.window_width/2
                 axis[0] *= resp
+                axis[0] += variables.window_width/2
+                axis[0] -= variables.x_gap*variables.pixelgap
             elif (type == "sy"):
+                axis[1] -= variables.y_gap*variables.pixelgap
+                axis[1] -= variables.window_height/2
                 axis[1] *= resp
+                axis[1] += variables.window_height/2
+                axis[1] += variables.y_gap*variables.pixelgap
     
     draw_objects()
     launch_dash(on_button_click)

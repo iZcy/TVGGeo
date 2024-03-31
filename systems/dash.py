@@ -21,7 +21,7 @@ def launch_dash(on_button_click, reset=False):
     entryTX.grid(row=1, column=0, padx=5)
     entryTX.insert(0, float(variables.trans_x))
     
-    buttonTX = tk.Button(variables.frame, text="Swipe X", command=((lambda: on_button_click(entry=entryTX, type="x"))) if not_selected else (lambda: variables.selected_object.move(posX=float(entryTX.get()))))
+    buttonTX = tk.Button(variables.frame, text="Swipe X", command=(lambda: on_button_click(entry=entryTX, type="x")) if not_selected else (lambda: variables.selected_object.move(posX=float(entryTX.get()))))
     buttonTX.grid(row=1, column=1, padx=(0, 10))
     
     # Create a Translate Y
@@ -29,7 +29,7 @@ def launch_dash(on_button_click, reset=False):
     entryTY.grid(row=1, column=2, padx=5)
     entryTY.insert(0, float(variables.trans_y))
     
-    buttonTY = tk.Button(variables.frame, text="Swipe Y", command=((lambda: on_button_click(entry=entryTY, type="y"))) if not_selected else (lambda: variables.selected_object.move(posY=float(entryTY.get()))))
+    buttonTY = tk.Button(variables.frame, text="Swipe Y", command=(lambda: on_button_click(entry=entryTY, type="y")) if not_selected else (lambda: variables.selected_object.move(posY=float(entryTY.get()))))
     buttonTY.grid(row=1, column=3, padx=(0, 10))
     
     # Create a Scale X
@@ -37,7 +37,7 @@ def launch_dash(on_button_click, reset=False):
     entrySx.grid(row=2, column=0, padx=5)
     entrySx.insert(0, float(variables.scale_x))
     
-    buttonSx = tk.Button(variables.frame, text="Zoom X", command=lambda: on_button_click(entry=entrySx, type="sx"))
+    buttonSx = tk.Button(variables.frame, text="Zoom X", command=(lambda: on_button_click(entry=entrySx, type="sx")) if not_selected else (lambda: variables.selected_object.scale(scaleX=float(entrySx.get()))))
     buttonSx.grid(row=2, column=1, padx=(0, 10))
     
     # Create a Scale Y
@@ -45,5 +45,5 @@ def launch_dash(on_button_click, reset=False):
     entrySy.grid(row=2, column=2, padx=5)
     entrySy.insert(0, float(variables.scale_y))
     
-    buttonSy = tk.Button(variables.frame, text="Zoom Y", command=lambda: on_button_click(entry=entrySy, type="sy"))
+    buttonSy = tk.Button(variables.frame, text="Zoom Y", command=(lambda: on_button_click(entry=entrySy, type="sy")) if not_selected else (lambda: variables.selected_object.scale(scaleY=float(entrySy.get()))))
     buttonSy.grid(row=2, column=3, padx=(0, 10))
