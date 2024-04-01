@@ -46,10 +46,10 @@ def launch_title(not_selected):
     if not not_selected:
         cpos = variables.selected_object.getNormCpos()
         pos_string = f"({f"{variables.x_gap}, {variables.y_gap}" if not_selected else f"{"{:.{}f}".format(cpos[0], 3)}, {"{:.{}f}".format(cpos[1], 3)}"})"
-    
+
     text_widget = tk.Label(variables.frame, height=1)
     text_widget.grid(row=0, column=0, columnspan=5 + (0 if not_selected else 2) + (0 if not variables.insertingMatrix else -1))
-    text_widget.config(text=f"Selecting : {("Default Display (Please click an existing Shape)") if not_selected else (variables.selected_object.name)} {pos_string}")
+    text_widget.config(text=f"Selecting : {(f"Default Display ({"{:.{}f}".format(variables.x_gap, 3)}, {"{:.{}f}".format(variables.y_gap, 3)}) (Please click an existing Shape)") if not_selected else (variables.selected_object.name)} {pos_string}")
 
 def launch_dash_normal(on_button_click, not_selected):
     entryNull = tk.Entry(variables.frame)
@@ -150,7 +150,7 @@ def launch_dash_matrix(on_button_click):
 
 def launch_dash_object(on_button_click):
     shapes = ["Triangle", "Rectangle", "Pentagon", "Hexagon", "Circle", "Custom"]
-    obj_string = "Please choose what object would you like to make."
+    obj_string = "Please choose what object would you like to make (click screen to go back)."
     obj_widget = tk.Label(variables.frame, height=1, text=obj_string)
     obj_widget.grid(row=1, column=0, columnspan=len(shapes))
     
@@ -162,13 +162,18 @@ def launch_dash_object(on_button_click):
     get_value = lambda entry: float(entry.get())
     get_entries = lambda: [get_value(entry) for entry in entries]
         
-    coor_string = "Origin coordinate: "
+    coor_string = "Custom Center: "
     coor_widget = tk.Label(variables.frame, height=1, text=coor_string)
     coor_widget.grid(row=3, column=0, columnspan=2)
     
     buttons = [tk.Button(variables.frame, text=shapes[i], command=(lambda on_button_click = on_button_click, i=i, center=lambda: get_entries() : toggleSelectCreate(on_button_click, i, center))) for i in range(len(shapes))]
     for i, button in enumerate(buttons):
         button.grid(row=2, column=i)
+        
+    # Checkbox on self center
+    checkbox_var = tk.BooleanVar(value=variables.useDefaultCenter)
+    checkbox = tk.Checkbutton(variables.frame, text="Use Default Center (ignore custom center)", variable=checkbox_var, command=(lambda: toggleUseDefCenter(checkbox_var.get())))
+    checkbox.grid(row=4, column=0, columnspan=len(shapes))
 
 def launch_dash_custom_object(on_button_click):
     obj_string = "Create your object. Please pick the points on the screen."
@@ -221,6 +226,7 @@ def toggleSelectCreate(on_button_click, idx=0, center=lambda: [0, 0]):
             
         if idx != 5:
             draw_objects()
+            variables.useDefaultCenter = True
     
     variables.creatingObject = not variables.creatingObject
     launch_dash(on_button_click)
@@ -231,21 +237,29 @@ def toggleCreate(on_button_click):
         
         if len(variables.editingObject.coords) != 0:
             variables.editingObject.setRealCenter()
-            getCenter = getNormPos([variables.editingObject.cpos])[0]
-            transX, transY = [(variables.customCenter[i] - curr) for i, curr in enumerate(getCenter)]
-            translate = getTranslateMatrix(transX=transX, transY=transY)
-            variables.editingObject.transform(transMatrix=translate)
+            
+            if not variables.useDefaultCenter:
+                getCenter = getNormPos([variables.editingObject.cpos])[0]
+                transX, transY = [(variables.customCenter[i] - curr) for i, curr in enumerate(getCenter)]
+                translate = getTranslateMatrix(transX=transX, transY=transY)
+                variables.editingObject.transform(transMatrix=translate)
+        else:
+            variables.editingObject.destroy()
         
         variables.editingObject = None
         variables.customCenter = [0, 0]
         
     variables.creatingCustomObject = False
     variables.creatingObject = False
+    variables.useDefaultCenter = True
     
     launch_dash(on_button_click)
     
 def toggleSelfCenter(value):
     variables.selfCenter = value
+
+def toggleUseDefCenter(value):
+    variables.useDefaultCenter = value
 
 def randomColor():
     return rgb_to_hex(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))

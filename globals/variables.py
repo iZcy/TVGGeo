@@ -38,6 +38,7 @@ selfCenter = False
 matrixCache = [[1, 0, 0],[0, 1, 0],[0, 0, 1]]
 matrixDefault = [[1, 0, 0],[0, 1, 0],[0, 0, 1]]
 customCenter = [0, 0]
+useDefaultCenter = True
 
 # Add Object
 creatingObject = False

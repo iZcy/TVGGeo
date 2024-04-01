@@ -4,8 +4,10 @@ from globals import variables
 from systems.dash import launch_dash
 
 def on_screen_click(event):
-    if variables.creatingObject or variables.insertingMatrix or variables.creatingCustomObject:
+    if variables.insertingMatrix or variables.creatingCustomObject:
         return
+    
+    variables.creatingObject = False
     
     prevName = None
     if variables.selected_object != None:
@@ -26,9 +28,9 @@ def on_button_click(entry, type):
 
     # Move the plane
     if (type == "rx"):
-        variables.zoomX *= -1
-    elif (type == "ry"):
         variables.zoomY *= -1
+    elif (type == "ry"):
+        variables.zoomX *= -1
     
     if (resp == 0):
         None
@@ -47,6 +49,11 @@ def on_button_click(entry, type):
         
     # Move the objects relative to the plane
     for obj in variables.obj_shapes:
+        if (type == "rx"):
+            obj.scale(scaleY=-1, static=True)
+        elif (type == "ry"):
+            obj.scale(scaleX=-1, static=True)
+        
         if (resp == 0):
             break
         elif (type == "x"):
