@@ -14,7 +14,7 @@ def launch_window():
     variables.root.title("Geometry Transformation | 22/499769/TK/54763")
     
     # Set the window icon
-    variables.root.iconbitmap("./globals/icons.ico")
+    # variables.root.iconbitmap("./globals/icons.ico")
     
     # Create a canvas
     variables.canvas = tk.Canvas(variables.root, width=variables.window_width, height=variables.window_height-130)
