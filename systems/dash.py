@@ -32,13 +32,16 @@ def launch_dash(on_button_click, reset=False):
     launch_dash_normal(on_button_click, not_selected)
     
     if not not_selected:
-        launch_dash_not_selected(on_button_click)    
+        launch_dash_selected(on_button_click)    
 
     draw_objects()
 
 def launch_title(not_selected):
     # Create a Text widget with state="disabled" to make it read-only
-    pos_string = f"({f"{variables.x_gap}, {variables.y_gap}" if not_selected else f"{(variables.selected_object.cpos[0] - variables.window_width/2)/variables.pixelgap}, {(variables.window_height/2 - variables.selected_object.cpos[1])/variables.pixelgap}"})"
+    pos_string = ""
+    if not not_selected:
+        cpos = variables.selected_object.getNormCpos()
+        pos_string = f"({f"{variables.x_gap}, {variables.y_gap}" if not_selected else f"{cpos[0]}, {cpos[1]}"})"
     
     text_widget = tk.Label(variables.frame, height=1)
     text_widget.grid(row=0, column=0, columnspan=5 + (0 if not_selected else 2) + (0 if not variables.insertingMatrix else -1))
@@ -88,13 +91,12 @@ def launch_dash_normal(on_button_click, not_selected):
     buttonRy = tk.Button(variables.frame, text="Reflect Y", command=(lambda: on_button_click(entry=entryNull, type="ry")) if not_selected else (lambda: variables.selected_object.reflect(axis="y")))
     buttonRy.grid(row=2, column=4, padx=(0, 10))
     
-    
     if not_selected:
         # Create an Object Creator
         buttonCreate = tk.Button(variables.frame, text="Create Object", command=(lambda: toggleCreate(on_button_click)))
         buttonCreate.grid(row=3, column=0, columnspan=5, padx=(0, 10))
 
-def launch_dash_not_selected(on_button_click):
+def launch_dash_selected(on_button_click):
     # Create a Rotation Matrix
     entryRot = tk.Entry(variables.frame, width=10)
     entryRot.grid(row=1, column=5, padx=5)
@@ -103,55 +105,44 @@ def launch_dash_not_selected(on_button_click):
     buttonRot = tk.Button(variables.frame, text="Rotate", command=lambda: variables.selected_object.rotate(deg=float(entryRot.get())))
     buttonRot.grid(row=2, column=5, padx=(0, 10))
     
+    # Custom Matrix
     buttonMtx = tk.Button(variables.frame, text="Custom Matrix", command=lambda: toggleMatrix(on_button_click))
     buttonMtx.grid(row=1, column=6, padx=(0, 10))
     
+    # Delete Object
     buttonDel = tk.Button(variables.frame, text="Delete", command=variables.selected_object.destroy)
     buttonDel.grid(row=2, column=6, padx=(0, 10))
+    
+    # Checkbox on self center
+    checkbox_var = tk.BooleanVar(value=variables.selfCenter)
+    checkbox = tk.Checkbutton(variables.frame, text="Self-Center Transformation", variable=checkbox_var, command=(lambda: toggleSelfCenter(checkbox_var.get())))
+    checkbox.grid(row=3, column=0, columnspan=7)
         
 def launch_dash_matrix(on_button_click):
-    width=5
-    entry11 = tk.Entry(variables.frame, width=width)
-    entry11.grid(row=1, column=0, padx=5)
-    entry11.insert(0, 1)
+    matrix = variables.matrixCache
     
-    entry12 = tk.Entry(variables.frame, width=width)
-    entry12.grid(row=2, column=0, padx=5)
-    entry12.insert(0, 0)
+    # Create Entry widgets
+    entries = [[tk.Entry(variables.frame, width=5) for _ in range(3)] for _ in range(3)]
     
-    entry13 = tk.Entry(variables.frame, width=width)
-    entry13.grid(row=3, column=0, padx=5)
-    entry13.insert(0, 0)
+    get_float = lambda entry: float(entry.get())
     
-    entry21 = tk.Entry(variables.frame, width=width)
-    entry21.grid(row=1, column=1, padx=5)
-    entry21.insert(0, 0)
+    for i, row in enumerate(entries):
+        for j, entry in enumerate(row):
+            entry.grid(row=j+1, column=i, padx=5)
+            entry.insert(0, matrix[i][j])
     
-    entry22 = tk.Entry(variables.frame, width=width)
-    entry22.grid(row=2, column=1, padx=5)
-    entry22.insert(0, 1)
-    
-    entry23 = tk.Entry(variables.frame, width=width)
-    entry23.grid(row=3, column=1, padx=5)
-    entry23.insert(0, 0)
-    
-    entry31 = tk.Entry(variables.frame, width=width)
-    entry31.grid(row=1, column=2, padx=5)
-    entry31.insert(0, 0)
-    
-    entry32 = tk.Entry(variables.frame, width=width)
-    entry32.grid(row=2, column=2, padx=5)
-    entry32.insert(0, 0)
-    
-    entry33 = tk.Entry(variables.frame, width=width)
-    entry33.grid(row=3, column=2, padx=5)
-    entry33.insert(0, 1)
+    construct_matrix = lambda: [[get_float(entry) for entry in row] for row in entries]
     
     buttonMtx = tk.Button(variables.frame, text="Back", command=(lambda: toggleMatrix(on_button_click)))
     buttonMtx.grid(row=1, column=3, padx=(0, 10))
     
-    buttonExec = tk.Button(variables.frame, text="Transform", command=(lambda: variables.selected_object.transform([[float(entry11.get()), float(entry12.get()), float(entry13.get())], [float(entry21.get()), float(entry22.get()), float(entry23.get())], [float(entry31.get()), float(entry32.get()), float(entry33.get())]])))
+    buttonExec = tk.Button(variables.frame, text="Transform", command=(lambda: inputMatrixChanges(construct_matrix())))
     buttonExec.grid(row=2, column=3, padx=(0, 10))
+    
+    # Checkbox on self center
+    checkbox_var = tk.BooleanVar(value=variables.selfCenter)
+    checkbox = tk.Checkbutton(variables.frame, text="Self-Center", variable=checkbox_var, command=(lambda: toggleSelfCenter(checkbox_var.get())))
+    checkbox.grid(row=3, column=3)
 
 def launch_dash_object(on_button_click):
     obj_string = "Create your object. Please pick the points on the screen."
@@ -170,7 +161,14 @@ def launch_dash_object(on_button_click):
 
 def toggleMatrix(on_button_click):
     variables.insertingMatrix = not variables.insertingMatrix
+    if not variables.insertingMatrix:
+        variables.matrixCache = variables.matrixDefault
+    
     launch_dash(on_button_click)
+    
+def inputMatrixChanges(matrix):
+    variables.matrixCache = matrix
+    variables.selected_object.transform(matrix)
     
 def toggleCreate(on_button_click):
     variables.pickedVertex = []
@@ -178,6 +176,9 @@ def toggleCreate(on_button_click):
     variables.creatingObject = not variables.creatingObject
         
     launch_dash(on_button_click)
+    
+def toggleSelfCenter(value):
+    variables.selfCenter = value
     
 def rgb_to_hex(red, green, blue):
     return "#{:02x}{:02x}{:02x}".format(red, green, blue)

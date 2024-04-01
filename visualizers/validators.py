@@ -19,15 +19,16 @@ def point_inside_polygon(x, y, poly):
     return inside
 
 def check_points(event):
+    # Reset selected values
+    variables.insertingMatrix = False
+    variables.selfCenter = False
+    
+    if variables.selected_object != None:
+        variables.selected_object.onSelect(selected=False)
+    
+    # Check for new Value
     for obj in variables.obj_shapes:
         cond = point_inside_polygon(event.x, event.y, obj.coords)
-        obj.onSelect(selected=False)
-        variables.insertingMatrix = False
-        if variables.selected_object != None:
-            variables.selected_object.onSelect(selected=False)
-        
-        if variables.creatingObject == False:
-            variables.pickedVertex = []
         
         if (cond):
             obj.onSelect(selected=True)

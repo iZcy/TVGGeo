@@ -21,6 +21,11 @@ class Shapes:
         
         self.refresh()
     
+    def getNormCpos(self):
+        nCPosX = (variables.selected_object.cpos[0] - variables.window_width/2)/variables.pixelgap
+        nCPosY = (variables.window_height/2 - variables.selected_object.cpos[1])/variables.pixelgap
+        return [nCPosX, nCPosY]
+    
     def move(self, posX=None, posY=None, static=False):
         dposX, dposY = 0, 0
         if posX != None:
@@ -64,11 +69,11 @@ class Shapes:
         self.transform(transMatrix=rotDegMtx, static=static)
         
     def transform(self, transMatrix, static=False):
-        newPos = transformation(coords=self.coords, trans=transMatrix)
+        newPos = transformation(coords=self.coords, trans=transMatrix, ptr=self)
         self.coords = newPos
         
         if not static:
-            self.cpos = (transformation(coords=[self.cpos], trans=transMatrix))[0]
+            self.cpos = (transformation(coords=[self.cpos], trans=transMatrix, ptr=self))[0]
         
         self.refresh()
     
@@ -109,7 +114,7 @@ def getBackPos(coords):
         matrixPos.append([xPos, yPos])
     return matrixPos
 
-def transformation(coords, trans):
+def transformation(coords, trans, ptr=None):
     # Normalize Coordinate
     normPos = getNormPos(coords=coords)
     
@@ -122,6 +127,16 @@ def transformation(coords, trans):
     # Get Transformation Matrix
     matrixOrdTrans = trans
     matrixTrans = np.array(matrixOrdTrans)
+    
+    # Special Condition: on self center
+    toCenterMtx, toOriginMtx = [], []
+    if variables.selfCenter:
+        nCPosX, nCPosY = ptr.getNormCpos()
+        toCenterMtx = getTranslateMatrix(transX=-nCPosX, transY=-nCPosY)
+        toOriginMtx = getTranslateMatrix(transX= nCPosX, transY= nCPosY)
+        
+        matrixTrans = np.dot(toCenterMtx, matrixTrans)
+        matrixTrans = np.dot(matrixTrans, toOriginMtx)
     
     # Execute Transformation
     matrixRes = np.dot(normMtx, matrixTrans)

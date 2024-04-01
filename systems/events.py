@@ -4,7 +4,7 @@ from globals import variables
 from systems.dash import launch_dash
 
 def on_screen_click(event):
-    if variables.creatingObject:
+    if variables.creatingObject or variables.insertingMatrix:
         return
     
     prevName = None

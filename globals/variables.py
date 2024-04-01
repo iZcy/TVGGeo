@@ -34,6 +34,9 @@ scale_x = 1.0
 scale_y = 1.0
 rot = 0.0
 insertingMatrix = False
+selfCenter = False
+matrixCache = [[1, 0, 0],[0, 1, 0],[0, 0, 1]]
+matrixDefault = [[1, 0, 0],[0, 1, 0],[0, 0, 1]]
 
 # Add Object
 creatingObject = False
