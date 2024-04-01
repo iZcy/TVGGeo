@@ -96,6 +96,22 @@ class Shapes:
         self.refresh()
         del self
 
+def create_triangle(base, height, name, color, outline, launcher):
+    # Calculate the coordinates of the triangle
+    x1 = variables.origin_x - base/2 * variables.pixelgap
+    y1 = variables.origin_y + height/2 * variables.pixelgap
+    x2 = variables.origin_x
+    y2 = variables.origin_y - height/2 * variables.pixelgap
+    x3 = variables.origin_x + base/2 * variables.pixelgap
+    y3 = variables.origin_y + height/2 * variables.pixelgap
+    
+    # Draw the triangle and add it to the obj_shapes list
+    newTriangle = Shapes(name=name, color=color, outline=outline, coords=[[x1, y1], [x2, y2], [x3, y3]], launcher=launcher)
+    translate = getTranslateMatrix(transX=variables.customCenter[0], transY=variables.customCenter[1])
+    newTriangle.transform(transMatrix=translate)
+    
+    variables.obj_shapes.append(newTriangle)
+
 def create_rect(width, height, name, color, outline, launcher):
     # Calculate the coordinates of the square
     x1 = variables.origin_x - width/2 * variables.pixelgap
@@ -105,8 +121,63 @@ def create_rect(width, height, name, color, outline, launcher):
     
     # Draw the square and add it to the obj_shapes list
     newRect = Shapes(name=name, color=color, outline=outline, coords=[[x1, y1], [x1, y2], [x2, y2], [x2, y1]], launcher=launcher)
+    translate = getTranslateMatrix(transX=variables.customCenter[0], transY=variables.customCenter[1])
+    newRect.transform(transMatrix=translate)
     
     variables.obj_shapes.append(newRect)
+
+def create_pentagon(side_length, name, color, outline, launcher):
+    # Calculate the coordinates of the pentagon
+    angle = 360 / 5  # Angle between each vertex of the pentagon
+    pentagon_coords = []
+    for i in range(5):
+        x = (variables.origin_x / variables.pixelgap + side_length * math.cos(math.radians(i * angle))) * variables.pixelgap
+        y = (variables.origin_y / variables.pixelgap + side_length * math.sin(math.radians(i * angle))) * variables.pixelgap
+        pentagon_coords.append([x, y])
+    
+    # Draw the pentagon and add it to the obj_shapes list
+    newPentagon = Shapes(name=name, color=color, outline=outline, coords=pentagon_coords, launcher=launcher)
+    translate = np.array(getTranslateMatrix(transX=variables.customCenter[0], transY=variables.customCenter[1]))
+    rot = np.array(getRotMatrix(deg=-18))
+    transform = (np.dot(rot, translate)).tolist()
+    
+    newPentagon.transform(transMatrix=transform)
+    
+    variables.obj_shapes.append(newPentagon)
+
+def create_hexagon(side_length, name, color, outline, launcher):
+    # Calculate the coordinates of the hexagon
+    angle = 360 / 6  # Angle between each vertex of the hexagon
+    hexagon_coords = []
+    for i in range(6):
+        x = (variables.origin_x / variables.pixelgap + side_length * math.cos(math.radians(i * angle))) * variables.pixelgap
+        y = (variables.origin_y / variables.pixelgap + side_length * math.sin(math.radians(i * angle))) * variables.pixelgap
+        hexagon_coords.append([x, y])
+    
+    # Draw the hexagon and add it to the obj_shapes list
+    newHexagon = Shapes(name=name, color=color, outline=outline, coords=hexagon_coords, launcher=launcher)
+    translate = getTranslateMatrix(transX=variables.customCenter[0], transY=variables.customCenter[1])
+    newHexagon.transform(transMatrix=translate)
+    
+    variables.obj_shapes.append(newHexagon)
+
+def create_circle(radius, name, color, outline, launcher):
+    # Calculate the coordinates of the circle
+    vertices = []
+    num_vertices = 360
+    angle_step = 360 / num_vertices 
+    for i in range(num_vertices):
+        angle = math.radians(i * angle_step)
+        x = (variables.origin_x/variables.pixelgap + radius * math.cos(angle))*variables.pixelgap
+        y = (variables.origin_y/variables.pixelgap + radius * math.sin(angle))*variables.pixelgap
+        vertices.append([x, y])
+    
+    # Draw the circle and add it to the obj_shapes list
+    newCircle = Shapes(name=name, color=color, outline=outline, coords=vertices, launcher=launcher)
+    # translate = getTranslateMatrix(transX=variables.customCenter[0], transY=variables.customCenter[1])
+    # newCircle.transform(transMatrix=translate)
+    
+    variables.obj_shapes.append(newCircle)
 
 def getNormPos(coords):
     matrixCoor = []

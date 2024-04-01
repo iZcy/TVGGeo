@@ -178,7 +178,7 @@ def launch_dash_custom_object(on_button_click):
     buttonMtx = tk.Button(variables.frame, text="Complete", command=(lambda: toggleCreate(on_button_click)))
     buttonMtx.grid(row=2, column=0, columnspan=5, padx=(0, 10))
     
-    polyColor = rgb_to_hex(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+    polyColor = randomColor()
     newPoly = Shapes(name=f"Object {variables.numObj}", color=polyColor, outline=polyColor, coords=[], launcher=lambda: launch_dash(on_button_click))
     variables.numObj += 1
     
@@ -199,8 +199,28 @@ def inputMatrixChanges(matrix):
 def toggleSelectCreate(on_button_click, idx=0, center=lambda: [0, 0]):
     if variables.creatingObject:
         variables.customCenter = center()
-        if idx == 5:
+        color = randomColor()
+        height = 2
+        width = 2
+        name = f"Object {variables.numObj}"
+        variables.numObj += 1
+        launcher = lambda: launch_dash(on_button_click)
+        
+        if idx == 0:
+            create_triangle(name=name, base=width, height=height, color=color, outline=color, launcher=launcher)
+        elif idx == 1:
+            create_rect(name=name, width=width, height=height, color=color, outline=color, launcher=launcher)
+        elif idx == 2:
+            create_pentagon(side_length=width, name=name, color=color, outline=color, launcher=launcher)
+        elif idx == 3:
+            create_hexagon(side_length=width, name=name, color=color, outline=color, launcher=launcher)
+        elif idx == 4:
+            create_circle(radius=width, name=name, color=color, outline=color, launcher=launcher)
+        elif idx == 5:
             variables.creatingCustomObject = True
+            
+        if idx != 5:
+            draw_objects()
     
     variables.creatingObject = not variables.creatingObject
     launch_dash(on_button_click)
@@ -226,6 +246,9 @@ def toggleCreate(on_button_click):
     
 def toggleSelfCenter(value):
     variables.selfCenter = value
-    
+
+def randomColor():
+    return rgb_to_hex(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
 def rgb_to_hex(red, green, blue):
     return "#{:02x}{:02x}{:02x}".format(red, green, blue)
