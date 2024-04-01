@@ -8,7 +8,7 @@ class Shapes:
     def __init__(self, name, color="black", outline="black", coords=[[0,0]], cpos = [0,0], launcher=None):
         self.name = name
         self.coords = coords
-        self.cpos = cpos
+        self.cpos = [cpos[0]+variables.window_width/2, cpos[1]+variables.window_height/2]
         self.color = color
         self.outline = outline
         self.launcher = launcher
@@ -83,10 +83,10 @@ class Shapes:
 
 def create_rect(width, height, name, color, outline, launcher):
     # Calculate the coordinates of the square
-    x1 = variables.origin_x - width * variables.pixelgap
-    y1 = variables.origin_y - height * variables.pixelgap
-    x2 = variables.origin_x + width * variables.pixelgap
-    y2 = variables.origin_y + height * variables.pixelgap
+    x1 = variables.origin_x - width/2 * variables.pixelgap
+    y1 = variables.origin_y - height/2 * variables.pixelgap
+    x2 = variables.origin_x + width/2 * variables.pixelgap
+    y2 = variables.origin_y + height/2 * variables.pixelgap
     
     # Draw the square and add it to the obj_shapes list
     newRect = Shapes(name=name, color=color, outline=outline, coords=[[x1, y1], [x1, y2], [x2, y2], [x2, y1]], launcher=launcher)
@@ -96,16 +96,16 @@ def create_rect(width, height, name, color, outline, launcher):
 def getNormPos(coords):
     matrixCoor = []
     for coor in coords:
-        xPos =   (coor[0] - variables.window_width/2)/variables.pixelgap+variables.x_gap
-        yPos = -((coor[1] - variables.window_height/2)/variables.pixelgap+variables.y_gap)
+        xPos = (coor[0] + variables.x_gap*variables.pixelgap - variables.window_width/2)/variables.pixelgap
+        yPos = -(coor[1] - variables.y_gap*variables.pixelgap - variables.window_height/2)/variables.pixelgap
         matrixCoor.append([xPos, yPos])
     return matrixCoor
 
 def getBackPos(coords):
     matrixPos = []
     for coor in coords:
-        xPos =  (coor[0]-variables.x_gap)*variables.pixelgap + variables.window_height/2
-        yPos = ((-coor[1])-variables.y_gap)*variables.pixelgap + variables.window_height/2
+        xPos = (coor[0]*variables.pixelgap + variables.window_width/2 - variables.x_gap*variables.pixelgap)
+        yPos = (-coor[1]*variables.pixelgap + variables.window_height/2 + variables.y_gap*variables.pixelgap)
         matrixPos.append([xPos, yPos])
     return matrixPos
 

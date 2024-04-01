@@ -49,4 +49,4 @@ def bindings():
 
 def inits():
     launch_dash(on_button_click, reset=True)
-    create_rect(width=1, height=1, name="Rect Red", color="red", outline="red", launcher=lambda: launch_dash(on_button_click))
+    create_rect(width=2, height=2, name="Rect Red", color="red", outline="red", launcher=lambda: launch_dash(on_button_click))

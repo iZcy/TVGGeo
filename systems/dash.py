@@ -38,7 +38,7 @@ def launch_dash(on_button_click, reset=False):
 
 def launch_title(not_selected):
     # Create a Text widget with state="disabled" to make it read-only
-    pos_string = f"({f"{variables.x_gap}, {variables.y_gap}" if not_selected else f"{variables.selected_object.cpos[0]/variables.pixelgap}, {variables.selected_object.cpos[1]/-variables.pixelgap}"})"
+    pos_string = f"({f"{variables.x_gap}, {variables.y_gap}" if not_selected else f"{(variables.selected_object.cpos[0] - variables.window_width/2)/variables.pixelgap}, {(variables.window_height/2 - variables.selected_object.cpos[1])/variables.pixelgap}"})"
     
     text_widget = tk.Label(variables.frame, height=1)
     text_widget.grid(row=0, column=0, columnspan=5 + (0 if not_selected else 2) + (0 if not variables.insertingMatrix else -1))
