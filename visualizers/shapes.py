@@ -26,6 +26,16 @@ class Shapes:
         nCPosY = (variables.window_height/2 - variables.selected_object.cpos[1])/variables.pixelgap
         return [nCPosX, nCPosY]
     
+    def setRealCenter(self):
+        num_vertices = len(self.coords)
+        normVertex = getNormPos(self.coords)
+        total_x = sum(vertex[0] for vertex in normVertex)
+        total_y = sum(vertex[1] for vertex in normVertex)
+        center_x = total_x / num_vertices
+        center_y = total_y / num_vertices
+        oriCenter = getBackPos([[center_x, center_y]])[0]
+        self.cpos = oriCenter
+    
     def move(self, posX=None, posY=None, static=False):
         dposX, dposY = 0, 0
         if posX != None:

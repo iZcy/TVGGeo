@@ -27,10 +27,15 @@ def check_points(event):
         variables.selected_object.onSelect(selected=False)
     
     # Check for new Value
-    for obj in variables.obj_shapes:
+    if len(variables.obj_shapes) == 0:
+        return None
+    
+    reversedlist = variables.obj_shapes[::-1]
+    for obj in reversedlist:
         cond = point_inside_polygon(event.x, event.y, obj.coords)
         
         if (cond):
             obj.onSelect(selected=True)
             return obj
+        
     return None

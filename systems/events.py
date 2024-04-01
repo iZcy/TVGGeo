@@ -4,7 +4,7 @@ from globals import variables
 from systems.dash import launch_dash
 
 def on_screen_click(event):
-    if variables.creatingObject or variables.insertingMatrix:
+    if variables.creatingObject or variables.insertingMatrix or variables.creatingCustomObject:
         return
     
     prevName = None
@@ -66,14 +66,14 @@ def on_button_click(entry, type):
     launch_dash(on_button_click)
     
 def start_action(event):
-    if variables.creatingObject:
+    if variables.creatingCustomObject:
         # Bind motion event to continuously update coordinates
         variables.canvas.bind("<Motion>", lambda event : on_vertex_pick(event))
     else:
         on_screen_click(event)
 
 def stop_action(event=None):
-    if variables.creatingObject:
+    if variables.creatingCustomObject:
         # Unbind motion event when the mouse button is released
         variables.canvas.unbind("<Motion>")
     
