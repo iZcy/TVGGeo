@@ -114,12 +114,12 @@ class Shapes:
 
 def create_triangle(base, height, name, color, outline, launcher):
     # Calculate the coordinates of the triangle
-    x1 = variables.origin_x - base/2 * variables.pixelgap
-    y1 = variables.origin_y + height/2 * variables.pixelgap
-    x2 = variables.origin_x
-    y2 = variables.origin_y - height/2 * variables.pixelgap
-    x3 = variables.origin_x + base/2 * variables.pixelgap
-    y3 = variables.origin_y + height/2 * variables.pixelgap
+    x1 = variables.origin_x - base/2 * variables.pixelgap - variables.x_gap * variables.pixelgap
+    y1 = variables.origin_y + height/2 * variables.pixelgap + variables.y_gap * variables.pixelgap
+    x2 = variables.origin_x - variables.x_gap * variables.pixelgap
+    y2 = variables.origin_y - height/2 * variables.pixelgap + variables.y_gap * variables.pixelgap
+    x3 = variables.origin_x + base/2 * variables.pixelgap - variables.x_gap * variables.pixelgap
+    y3 = variables.origin_y + height/2 * variables.pixelgap + variables.y_gap * variables.pixelgap
     
     # Draw the triangle and add it to the obj_shapes list
     newTriangle = Shapes(name=name, color=color, outline=outline, coords=[[x1, y1], [x2, y2], [x3, y3]], launcher=launcher)
@@ -132,10 +132,10 @@ def create_triangle(base, height, name, color, outline, launcher):
 
 def create_rect(width, height, name, color, outline, launcher):
     # Calculate the coordinates of the square
-    x1 = variables.origin_x - width/2 * variables.pixelgap
-    y1 = variables.origin_y - height/2 * variables.pixelgap
-    x2 = variables.origin_x + width/2 * variables.pixelgap
-    y2 = variables.origin_y + height/2 * variables.pixelgap
+    x1 = variables.origin_x - width/2 * variables.pixelgap - variables.x_gap * variables.pixelgap
+    y1 = variables.origin_y - height/2 * variables.pixelgap + variables.y_gap * variables.pixelgap
+    x2 = variables.origin_x + width/2 * variables.pixelgap - variables.x_gap * variables.pixelgap
+    y2 = variables.origin_y + height/2 * variables.pixelgap + variables.y_gap * variables.pixelgap
     
     # Draw the square and add it to the obj_shapes list
     newRect = Shapes(name=name, color=color, outline=outline, coords=[[x1, y1], [x1, y2], [x2, y2], [x2, y1]], launcher=launcher)
@@ -151,8 +151,8 @@ def create_pentagon(side_length, name, color, outline, launcher):
     angle = 360 / 5  # Angle between each vertex of the pentagon
     pentagon_coords = []
     for i in range(5):
-        x = (variables.origin_x / variables.pixelgap + side_length * math.cos(math.radians(i * angle))) * variables.pixelgap
-        y = (variables.origin_y / variables.pixelgap + side_length * math.sin(math.radians(i * angle))) * variables.pixelgap
+        x = (variables.origin_x / variables.pixelgap + side_length * math.cos(math.radians(i * angle)) - variables.x_gap) * variables.pixelgap
+        y = (variables.origin_y / variables.pixelgap + side_length * math.sin(math.radians(i * angle)) + variables.y_gap) * variables.pixelgap
         pentagon_coords.append([x, y])
     
     # Draw the pentagon and add it to the obj_shapes list
@@ -172,8 +172,8 @@ def create_hexagon(side_length, name, color, outline, launcher):
     angle = 360 / 6  # Angle between each vertex of the hexagon
     hexagon_coords = []
     for i in range(6):
-        x = (variables.origin_x / variables.pixelgap + side_length * math.cos(math.radians(i * angle))) * variables.pixelgap
-        y = (variables.origin_y / variables.pixelgap + side_length * math.sin(math.radians(i * angle))) * variables.pixelgap
+        x = (variables.origin_x / variables.pixelgap + side_length * math.cos(math.radians(i * angle)) - variables.x_gap) * variables.pixelgap
+        y = (variables.origin_y / variables.pixelgap + side_length * math.sin(math.radians(i * angle)) + variables.y_gap) * variables.pixelgap
         hexagon_coords.append([x, y])
     
     # Draw the hexagon and add it to the obj_shapes list
@@ -192,8 +192,8 @@ def create_circle(radius, name, color, outline, launcher):
     angle_step = 360 / num_vertices 
     for i in range(num_vertices):
         angle = math.radians(i * angle_step)
-        x = (variables.origin_x/variables.pixelgap + radius * math.cos(angle))*variables.pixelgap
-        y = (variables.origin_y/variables.pixelgap + radius * math.sin(angle))*variables.pixelgap
+        x = (variables.origin_x/variables.pixelgap + radius * math.cos(angle) - variables.x_gap)*variables.pixelgap
+        y = (variables.origin_y/variables.pixelgap + radius * math.sin(angle) + variables.y_gap)*variables.pixelgap
         vertices.append([x, y])
     
     # Draw the circle and add it to the obj_shapes list
