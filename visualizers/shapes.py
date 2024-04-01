@@ -27,14 +27,7 @@ class Shapes:
         return [nCPosX, nCPosY]
     
     def setRealCenter(self):
-        num_vertices = len(self.coords)
-        normVertex = getNormPos(self.coords)
-        total_x = sum(vertex[0] for vertex in normVertex)
-        total_y = sum(vertex[1] for vertex in normVertex)
-        center_x = total_x / num_vertices
-        center_y = total_y / num_vertices
-        oriCenter = getBackPos([[center_x, center_y]])[0]
-        self.cpos = oriCenter
+        self.cpos = getCenter(self.coords)
     
     def move(self, posX=None, posY=None, static=False):
         dposX, dposY = 0, 0
@@ -67,9 +60,9 @@ class Shapes:
     def reflect(self, axis="x", static=False):
         refTransMtx = []
         if axis == "x":
-            refTransMtx = getScaleMatrix(scaleX=-1)
-        elif axis == "y":
             refTransMtx = getScaleMatrix(scaleY=-1)
+        elif axis == "y":
+            refTransMtx = getScaleMatrix(scaleX=-1)
         self.transform(transMatrix=refTransMtx, static=static)
     
     def rotate(self, deg=0, static=False):
@@ -78,14 +71,37 @@ class Shapes:
         rotDegMtx = getRotMatrix(deg)
         self.transform(transMatrix=rotDegMtx, static=static)
         
-    def transform(self, transMatrix, static=False):
-        newPos = transformation(coords=self.coords, trans=transMatrix, ptr=self)
+    def transform(self, transMatrix, static=False, movefirst=False):
+        transformer = transMatrix
+        
+        # Special Condition: on self center
+        toCenterMtx, toOriginMtx = [], []
+        if variables.selfCenter and not movefirst:
+            normCenter = getNormPos([self.cpos])[0]
+            
+            centerX = -normCenter[0] + variables.x_gap
+            centerY = -normCenter[1] + variables.y_gap
+            
+            toCenterMtx = getTranslateMatrix(transX=centerX, transY=centerY)
+            toOriginMtx = getTranslateMatrix(transX=-centerX, transY=-centerY)
+            
+            self.transform(transMatrix=toCenterMtx, movefirst=True, static=True)
+            
+            self.transform(transMatrix=transformer, movefirst=True, static=True)
+            
+            self.transform(transMatrix=toOriginMtx, movefirst=True, static=True)
+            self.refresh()
+            return
+        
+        # Without self center / self center steps
+        newPos = transformation(coords=self.coords, trans=transformer)
         self.coords = newPos
         
         if not static:
-            self.cpos = (transformation(coords=[self.cpos], trans=transMatrix, ptr=self))[0]
+            self.cpos = (transformation(coords=[self.cpos], trans=transformer))[0]
         
-        self.refresh()
+        if not movefirst:
+            self.refresh()
     
     def refresh(self):
         self.launcher()
@@ -205,7 +221,7 @@ def getBackPos(coords):
         matrixPos.append([xPos, yPos])
     return matrixPos
 
-def transformation(coords, trans, ptr=None):
+def transformation(coords, trans):
     # Normalize Coordinate
     normPos = getNormPos(coords=coords)
     
@@ -218,16 +234,6 @@ def transformation(coords, trans, ptr=None):
     # Get Transformation Matrix
     matrixOrdTrans = trans
     matrixTrans = np.array(matrixOrdTrans)
-    
-    # Special Condition: on self center
-    toCenterMtx, toOriginMtx = [], []
-    if variables.selfCenter:
-        nCPosX, nCPosY = ptr.getNormCpos()
-        toCenterMtx = getTranslateMatrix(transX=-nCPosX, transY=-nCPosY)
-        toOriginMtx = getTranslateMatrix(transX= nCPosX, transY= nCPosY)
-        
-        matrixTrans = np.dot(toCenterMtx, matrixTrans)
-        matrixTrans = np.dot(matrixTrans, toOriginMtx)
     
     # Execute Transformation
     matrixRes = np.dot(normMtx, matrixTrans)
@@ -254,3 +260,13 @@ def getScaleMatrix(scaleX=1, scaleY=1):
 def getTranslateMatrix(transX=0, transY=0):
     transMatrix=[[1, 0, 0], [0, 1, 0], [transX*variables.zoomX, transY*variables.zoomY, 1]]
     return transMatrix
+
+def getCenter(coords):
+    num_vertices = len(coords)
+    normVertex = getNormPos(coords)
+    total_x = sum(vertex[0] for vertex in normVertex)
+    total_y = sum(vertex[1] for vertex in normVertex)
+    center_x = total_x / num_vertices
+    center_y = total_y / num_vertices
+    oriCenter = getBackPos([[center_x, center_y]])[0]
+    return oriCenter

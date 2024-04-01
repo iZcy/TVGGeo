@@ -31,8 +31,10 @@ def check_points(event):
         return None
     
     reversedlist = variables.obj_shapes[::-1]
+    
     for obj in reversedlist:
         cond = point_inside_polygon(event.x, event.y, obj.coords)
+        
         if (cond):
             obj.onSelect(selected=True)
             return obj
